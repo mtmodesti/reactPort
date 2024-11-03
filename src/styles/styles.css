@@ -1,0 +1,21 @@
+:root {
+  --primary: #1c0b19;
+  --secondary: #140d4f;
+  --tertiary: #4ea699;
+  --quaternary: #2dd881;
+  --quinary: #6fedb7;
+  --accent: #e74c3c;
+  --background: #f6f7eb;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Para incluir o padding e a borda no cálculo da largura e altura */
+}
+
+.elevated {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+  border-radius: 8px; /* Opcional: bordas arredondadas */
+  padding: 16px; /* Opcional: preenchimento interno */
+}
