@@ -1,0 +1,8 @@
+Encontrar Pid da porta
+
+netstat -ano | findstr :PID
+TCP  0.0.0.0:3000  0.0.0.0:0  LISTENING   [PID]
+
+Mata o processo:
+taskkill /PID 3000 /F
+

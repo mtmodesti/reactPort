@@ -19,3 +19,7 @@
   border-radius: 8px; /* Opcional: bordas arredondadas */
   padding: 16px; /* Opcional: preenchimento interno */
 }
+
+.link {
+  color: var(--secondary);
+}

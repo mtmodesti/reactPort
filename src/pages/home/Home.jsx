@@ -1,6 +1,6 @@
 import React from "react";
 import "./Home.css";
-import LoginForm from "../../components/loginForm"; // Ajuste o caminho
+import LoginForm from "../../components/loginForm/LoginForm";
 
 const Home = () => {
   return (
