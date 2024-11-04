@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import "./loginForm.css";
 import { TextField, Button, Container, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import { fetchItems, addItem } from "../../services/firestoreService";
 
 const LoginForm = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
+  const [users, setUsers] = useState([]);
+  const [newUser, setNewUser] = useState({ nome: "", password: "" });
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -25,6 +28,31 @@ const LoginForm = () => {
   };
 
   const isButtonDisabled = !email || !password || !isEmailValid(email);
+
+  // Função para buscar os usuários
+  const handleGetUsers = async () => {
+    try {
+      const usersData = await fetchItems(); // Chama a função para buscar os usuários
+      console.log("---");
+      console.log(usersData);
+
+      setUsers(usersData); // Armazena os usuários no estado
+    } catch (error) {
+      setError("Erro ao buscar usuários."); // Trata o erro
+    }
+  };
+
+  // Função para adicionar um novo usuário
+  const handleAddUser = async () => {
+    console.log("a");
+    try {
+      await addItem({ name: "a", pass: "b" }); // Chama a função para adicionar um novo usuário
+      console.log("b");
+    } catch (error) {
+      console.log("bosta");
+      setError("Erro ao adicionar usuário."); // Trata o erro
+    }
+  };
 
   return (
     <Container sx={{ width: "300px" }} className="elevated">
@@ -64,6 +92,17 @@ const LoginForm = () => {
           sx={{ marginBottom: 2 }} // Espaço uniforme
         >
           Entrar
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          type="button"
+          fullWidth
+          disabled={false}
+          onClick={handleAddUser}
+          sx={{ marginBottom: 2 }}
+        >
+          Get Users
         </Button>
       </form>
       <Typography variant="body2" align="center">
