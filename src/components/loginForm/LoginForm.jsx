@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import "./loginForm.css";
+import { userExists } from "../../services/firestoreService";
 import { TextField, Button, Container, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
-import { fetchItems, addItem } from "../../services/firestoreService";
+import { useSnackbar } from "../../utils/SnackbarProvider";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
-  const [users, setUsers] = useState([]);
-  const [newUser, setNewUser] = useState({ nome: "", password: "" });
+  const showSnackbar = useSnackbar();
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -17,9 +18,27 @@ const LoginForm = () => {
     if (!email || !password) {
       setError("Todos os campos são obrigatórios.");
       return;
+    } else {
+      handleUser({ email, password });
     }
-    console.log("Email:", email);
-    console.log("Senha:", password);
+  };
+
+  const handleUser = async ({ password, email }) => {
+    try {
+      const isValidUser = await userExists(email, password);
+      if (isValidUser) {
+        showSnackbar("Login realizado com sucesso", "success");
+        console.log();
+        navigate("/dashboard");
+      } else {
+        showSnackbar("Credenciais inválidas", "error");
+      }
+    } catch {
+      showSnackbar(
+        "Erro no processo de validação. Tente novamente ou entre em contato com o administrador",
+        "error"
+      );
+    }
   };
 
   const isEmailValid = (email) => {
@@ -28,31 +47,6 @@ const LoginForm = () => {
   };
 
   const isButtonDisabled = !email || !password || !isEmailValid(email);
-
-  // Função para buscar os usuários
-  const handleGetUsers = async () => {
-    try {
-      const usersData = await fetchItems(); // Chama a função para buscar os usuários
-      console.log("---");
-      console.log(usersData);
-
-      setUsers(usersData); // Armazena os usuários no estado
-    } catch (error) {
-      setError("Erro ao buscar usuários."); // Trata o erro
-    }
-  };
-
-  // Função para adicionar um novo usuário
-  const handleAddUser = async () => {
-    console.log("a");
-    try {
-      await addItem({ name: "a", pass: "b" }); // Chama a função para adicionar um novo usuário
-      console.log("b");
-    } catch (error) {
-      console.log("bosta");
-      setError("Erro ao adicionar usuário."); // Trata o erro
-    }
-  };
 
   return (
     <Container sx={{ width: "300px" }} className="elevated">
@@ -68,8 +62,8 @@ const LoginForm = () => {
           error={!isEmailValid(email) && email.length > 0}
           helperText={
             !isEmailValid(email) && email.length > 0 ? "Email inválido" : " "
-          } // espaço para manter a altura
-          sx={{ marginBottom: 2 }} // Espaço uniforme
+          }
+          sx={{ marginBottom: 2 }}
         />
         <TextField
           label="Senha"
@@ -80,7 +74,7 @@ const LoginForm = () => {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          sx={{ marginBottom: 2 }} // Espaço uniforme
+          sx={{ marginBottom: 2 }}
         />
         {error && <Typography color="error">{error}</Typography>}
         <Button
@@ -89,28 +83,11 @@ const LoginForm = () => {
           type="submit"
           fullWidth
           disabled={isButtonDisabled}
-          sx={{ marginBottom: 2 }} // Espaço uniforme
+          sx={{ marginBottom: 2 }}
         >
           Entrar
         </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          type="button"
-          fullWidth
-          disabled={false}
-          onClick={handleAddUser}
-          sx={{ marginBottom: 2 }}
-        >
-          Get Users
-        </Button>
       </form>
-      <Typography variant="body2" align="center">
-        Não tem uma conta?{" "}
-        <Link to="/register" className="link">
-          Cadastre-se
-        </Link>
-      </Typography>
     </Container>
   );
 };

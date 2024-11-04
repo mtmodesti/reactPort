@@ -1,7 +1,6 @@
 import React from "react";
 import "./registerForm.css";
 import { TextField, Button, Container, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
 
 const RegisterForm = () => {
   const [email, setEmail] = React.useState("");
@@ -100,12 +99,6 @@ const RegisterForm = () => {
           Registrar
         </Button>
       </form>
-      <Typography variant="body2" align="center">
-        Já tem uma conta?{" "}
-        <Link to="/" className="link">
-          Entre
-        </Link>
-      </Typography>
     </Container>
   );
 };
