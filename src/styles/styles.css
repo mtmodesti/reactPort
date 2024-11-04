@@ -23,3 +23,8 @@
 .link {
   color: var(--secondary);
 }
+
+.accordeon-line {
+  width: 80%;
+  max-width: 700px;
+}

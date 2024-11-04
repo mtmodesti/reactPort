@@ -5,7 +5,6 @@ const NavigationContext = createContext();
 
 // Cria um provedor para o contexto
 export const NavigationProvider = ({ children }) => {
-  const [fromMenu, setFromMenu] = useState(false);
   const [navigationSource, setNavigationSource] = useState(null);
   return (
     <NavigationContext.Provider

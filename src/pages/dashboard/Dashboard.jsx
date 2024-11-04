@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useNavigation } from "../../context/NavigationContext";
 import "./dashboard.css";
+import AddUser from "../../components/addUser/Adduser";
 
 const Dashboard = () => {
   const { navigationSource } = useNavigation();
@@ -8,10 +9,9 @@ const Dashboard = () => {
   return (
     <div>
       {(navigationSource === "dashboard" || navigationSource === null) && (
-        <div>Conteúdo do Dashboard</div>
+        <AddUser></AddUser>
       )}
       {navigationSource === "relatorios" && <div>Conteúdo dos Relatórios</div>}
-      {/* Renderiza o conteúdo do Dashboard se navigationSource for null ou undefined */}
     </div>
   );
 };
