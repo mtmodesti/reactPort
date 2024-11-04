@@ -23,12 +23,11 @@ const LoginForm = () => {
     }
   };
 
-  const handleUser = async ({ password, email }) => {
+  const handleUser = async ({ email, password }) => {
     try {
-      const isValidUser = await userExists(email, password);
+      const isValidUser = await userExists(email, password, true);
       if (isValidUser) {
         showSnackbar("Login realizado com sucesso", "success");
-        console.log();
         navigate("/dashboard");
       } else {
         showSnackbar("Credenciais inválidas", "error");

@@ -15,7 +15,11 @@ export const addUser = async (newUser) => {
 
 // Função para verificar se um usuário com o email e senha especificados já existe
 export const userExists = async (email, password) => {
-  const q = query(collection(db, collectionName), where("email", "==", email));
+  const q = query(
+    collection(db, collectionName),
+    where("userEmail", "==", email),
+    where("password", "==", password)
+  );
   const querySnapshot = await getDocs(q);
 
   if (!querySnapshot.empty) {
@@ -32,9 +36,20 @@ export const userExists = async (email, password) => {
   return null; // Retorna null se o email não existir
 };
 
+export const emailExists = async (email) => {
+  const q = query(
+    collection(db, collectionName),
+    where("userEmail", "==", email)
+  );
+  const querySnapshot = await getDocs(q);
+
+  // Retorna true se existir pelo menos um documento com o email fornecido
+  return !querySnapshot.empty;
+};
+
 const setUserSession = (user) => {
-  sessionStorage.setItem("userName", user.name);
-  sessionStorage.setItem("userEmail", user.email);
+  sessionStorage.setItem("userName", user.userName);
+  sessionStorage.setItem("userEmail", user.userEmail);
   sessionStorage.setItem("userId", user.id);
   sessionStorage.setItem("role", user.role);
 };

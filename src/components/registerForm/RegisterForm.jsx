@@ -22,10 +22,6 @@ const RegisterForm = () => {
       setError("A confirmação de senha não corresponde à senha.");
       return;
     }
-
-    console.log("Email:", email);
-    console.log("Nome completo:", fullName);
-    console.log("Senha:", password);
   };
 
   const isEmailValid = (email) => {

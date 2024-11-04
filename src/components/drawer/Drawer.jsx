@@ -33,7 +33,7 @@ const DrawerSidenavMenu = () => {
       icon: <ListIcon />,
       submenu: [
         {
-          title: "Dashboard",
+          title: "Gerenciamento",
           icon: <DashboardIcon />,
           action: () => {
             setNavigationSource("dashboard");
