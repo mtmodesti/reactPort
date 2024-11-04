@@ -1,12 +1,15 @@
 import "./App.css";
 import "./styles/styles.css";
 import AppRoutes from "./routes/AppRoutes";
+import { NavigationProvider } from "./context/NavigationContext";
 
 function App() {
   return (
-    <div>
-      <AppRoutes />
-    </div>
+    <NavigationProvider>
+      <div>
+        <AppRoutes />
+      </div>
+    </NavigationProvider>
   );
 }
 
