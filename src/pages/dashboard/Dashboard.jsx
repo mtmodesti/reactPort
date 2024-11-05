@@ -1,16 +1,16 @@
 import * as React from "react";
 import { useNavigation } from "../../context/NavigationContext";
 import "./dashboard.css";
-import AddUser from "../../components/addUser/Adduser";
+import UserMaintenance from "../../containers/userMaintenance/UserMaintenance";
 
 const Dashboard = () => {
   const { navigationSource } = useNavigation();
   const userRole = sessionStorage.getItem("role");
 
   return (
-    <div>
+    <div className="dashboardWrapper">
       {(navigationSource === "dashboard" || navigationSource === null) &&
-        userRole === "admin" && <AddUser />}
+        userRole === "admin" && <UserMaintenance></UserMaintenance>}
       {navigationSource === "relatorios" && <div>Conteúdo dos Relatórios</div>}
     </div>
   );

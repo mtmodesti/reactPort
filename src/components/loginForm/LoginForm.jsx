@@ -1,14 +1,24 @@
 import React from "react";
 import "./loginForm.css";
-import { userExists } from "../../services/firestoreService";
-import { TextField, Button, Container, Typography } from "@mui/material";
+import { handleLogin } from "../../services/firestoreService";
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { useSnackbar } from "../../utils/SnackbarProvider";
 import { useNavigate } from "react-router-dom";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const LoginForm = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false); // Estado para mostrar/ocultar senha
   const showSnackbar = useSnackbar();
   const navigate = useNavigate();
 
@@ -25,7 +35,7 @@ const LoginForm = () => {
 
   const handleUser = async ({ email, password }) => {
     try {
-      const isValidUser = await userExists(email, password, true);
+      const isValidUser = await handleLogin(email, password);
       if (isValidUser) {
         showSnackbar("Login realizado com sucesso", "success");
         navigate("/dashboard");
@@ -48,7 +58,7 @@ const LoginForm = () => {
   const isButtonDisabled = !email || !password || !isEmailValid(email);
 
   return (
-    <Container sx={{ width: "300px" }} className="elevated">
+    <Container sx={{ width: "300px" }} className="elevated wrapper">
       <form onSubmit={handleSubmit}>
         <TextField
           label="Email"
@@ -66,13 +76,25 @@ const LoginForm = () => {
         />
         <TextField
           label="Senha"
-          type="password"
           variant="outlined"
           fullWidth
           margin="normal"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          type={showPassword ? "text" : "password"} // Mostrar ou ocultar a senha
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
           sx={{ marginBottom: 2 }}
         />
         {error && <Typography color="error">{error}</Typography>}

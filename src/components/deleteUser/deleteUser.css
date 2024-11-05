@@ -1,0 +1,8 @@
+.inputsWrapper{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+}

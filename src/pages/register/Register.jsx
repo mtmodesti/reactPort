@@ -4,7 +4,7 @@ import RegisterForm from "../../components/registerForm/RegisterForm";
 
 const Register = () => {
   return (
-    <div className="wrapper">
+    <div>
       <RegisterForm></RegisterForm>
     </div>
   );

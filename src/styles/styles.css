@@ -5,7 +5,6 @@
   --quaternary: #2dd881;
   --quinary: #6fedb7;
   --accent: #e74c3c;
-  --background: #f6f7eb;
 }
 
 * {
@@ -27,4 +26,32 @@
 .accordeon-line {
   width: 80%;
   max-width: 700px;
+}
+
+/* Cor do AccordionSummary (padrão) */
+.accordeon-line .MuiAccordionSummary-root {
+  background-color: rgba(72, 129, 190, 0.3); /* Azul mais forte */
+  border-radius: 4px; /* Borda arredondada opcional */
+}
+
+/* Cor de fundo do AccordionDetails */
+.accordeon-line .MuiAccordionDetails-root {
+  background-color: rgba(72, 129, 190, 0.1); /* Azul claro */
+  padding: 16px; /* Preenchimento interno */
+  border: 2px solid rgba(72, 129, 190, 0.3);
+}
+
+/* Efeito hover no AccordionSummary */
+.accordeon-line .MuiAccordionSummary-root:hover {
+  background-color: rgba(72, 129, 190, 0.4); /* Um pouco mais forte no hover */
+}
+
+html, body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  height: 100vh; /* Garante que o html e o body ocupem toda a altura da janela */
+  overflow: hidden; /* Impede o scroll da página */
 }

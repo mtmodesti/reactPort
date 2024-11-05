@@ -6,9 +6,7 @@ import { NavigationProvider } from "./context/NavigationContext";
 function App() {
   return (
     <NavigationProvider>
-      <div>
         <AppRoutes />
-      </div>
     </NavigationProvider>
   );
 }

@@ -1,5 +1,7 @@
 import * as React from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   Accordion,
   AccordionSummary,
@@ -11,13 +13,16 @@ import {
   Radio,
   RadioGroup,
   Button,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import {
-  userExists,
   emailExists,
   addUser,
+  documentExists,
 } from "../../services/firestoreService";
 import { useSnackbar } from "../../utils/SnackbarProvider";
+import "./addUser.css";
 
 const AddUser = () => {
   const showSnackbar = useSnackbar();
@@ -29,7 +34,7 @@ const AddUser = () => {
     address: "",
     role: "user",
     obs: "",
-    password: "", // Novo campo para a senha
+    password: "",
   });
 
   const [errors, setErrors] = React.useState({
@@ -37,8 +42,10 @@ const AddUser = () => {
     document: false,
     userEmail: false,
     address: false,
-    password: false, // Adicionando validação de erro para senha
+    password: false,
   });
+
+  const [showPassword, setShowPassword] = React.useState(false); // Estado para mostrar a senha
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -52,46 +59,34 @@ const AddUser = () => {
       formData.document &&
       formData.userEmail &&
       formData.address &&
-      formData.password // Validação para incluir o campo de senha
+      formData.password
     );
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const newErrors = {
-      userName: !formData.userName,
-      document: !formData.document,
-      userEmail: !formData.userEmail,
-      address: !formData.address,
-      password: !formData.password,
-    };
-
-    setErrors(newErrors);
-
-    if (!Object.values(newErrors).includes(true)) {
-      const isValidUser = await userExists(formData.userEmail, false);
-      if (isValidUser) {
+    try {
+      const isInvalidEmail = await emailExists(formData.userEmail);
+      if (isInvalidEmail) {
         showSnackbar("E-mail já cadastrado", "error");
         return;
-      } else {
-        try {
-          const isEmailRegistered = await emailExists(formData.userEmail);
-          if (isEmailRegistered) {
-            showSnackbar("E-mail já cadastrado", "error");
-          } else {
-            addUser(formData);
-            showSnackbar("Usuário adicionado com sucesso.", "success");
-          }
-        } catch {
-          showSnackbar("Erro durante o cadastro. Tente novamente.", "error");
-        }
       }
+      // Verificando se o 'document' já existe
+      const isDocumentRegistered = await documentExists(formData.document);
+      if (isDocumentRegistered) {
+        showSnackbar("CPF já cadastrado", "error");
+        return;
+      }
+
+      addUser(formData);
+      showSnackbar("Usuário adicionado com sucesso.", "success");
+    } catch {
+      showSnackbar("Erro durante o cadastro. Tente novamente.", "error");
     }
   };
 
   return (
-    <div className="wrapper">
       <Accordion className="accordeon-line">
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
@@ -114,7 +109,7 @@ const AddUser = () => {
               helperText={errors.userName ? "Campo obrigatório" : ""}
             />
             <TextField
-              label="Documento"
+              label="CPF"
               name="document"
               value={formData.document}
               onChange={handleChange}
@@ -155,9 +150,21 @@ const AddUser = () => {
               required
               fullWidth
               margin="normal"
-              type="password" // Campo para senha
+              type={showPassword ? "text" : "password"}
               error={errors.password}
               helperText={errors.password ? "Campo obrigatório" : ""}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <FormControl component="fieldset" margin="normal" required>
               <Typography variant="subtitle1" gutterBottom>
@@ -209,8 +216,8 @@ const AddUser = () => {
           </form>
         </AccordionDetails>
       </Accordion>
-    </div>
   );
 };
+//
 
 export default AddUser;
