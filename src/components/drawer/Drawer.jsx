@@ -16,7 +16,6 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { Collapse } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard"; // Ícone para "Dashboard"
-import AssessmentIcon from "@mui/icons-material/Assessment"; // Ícone para "Relatórios"
 import PersonIcon from "@mui/icons-material/Person"; // Ícone para "Gerenciar Profissionais"
 import BusinessIcon from "@mui/icons-material/Business"; // Ícone para "Gerenciar Unidades"
 import { useNavigate } from "react-router-dom";
