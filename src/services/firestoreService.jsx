@@ -148,9 +148,9 @@ const setUserSession = (user) => {
 
 // Função para atualizar um usuário pelo ID
 export const updateUser = async (userId, updatedData) => {
-    // Referência ao documento do usuário pelo ID
-    const userDocRef = doc(db, collectionName, userId);
-    // Atualizando os dados no Firestore
-    await updateDoc(userDocRef, updatedData);
-    return true; // Retorna true se a atualização for bem-sucedida
+  // Referência ao documento do usuário pelo ID
+  const userDocRef = doc(db, collectionName, userId);
+  // Atualizando os dados no Firestore
+  await updateDoc(userDocRef, updatedData);
+  return true; // Retorna true se a atualização for bem-sucedida
 };

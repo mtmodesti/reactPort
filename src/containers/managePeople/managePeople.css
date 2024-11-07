@@ -1,0 +1,8 @@
+.peopleContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-direction: column;
+  padding-top: 10px;
+}

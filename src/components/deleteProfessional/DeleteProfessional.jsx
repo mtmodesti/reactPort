@@ -1,13 +1,3 @@
-Encontrar Pid da porta
-
-netstat -ano | findstr :3000
-
-TCP    0.0.0.0:3000             0.0.0.0:0              LISTENING       1234 -> PID
-
-
-taskkill /PID 1234 /F
-
-
 import React, { useState } from "react";
 import {
   Accordion,

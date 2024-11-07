@@ -1,7 +1,8 @@
 import * as React from "react";
 import { useNavigation } from "../../context/NavigationContext";
 import "./dashboard.css";
-import UserMaintenance from "../../containers/userMaintenance/UserMaintenance";
+import ManagePeople from "../../containers/managePeople/ManagePeople";
+import ManageUnits from "../../containers/manageUnits/ManageUnits";
 
 const Dashboard = () => {
   const { navigationSource } = useNavigation();
@@ -9,9 +10,12 @@ const Dashboard = () => {
 
   return (
     <div className="dashboardWrapper">
-      {(navigationSource === "dashboard" || navigationSource === null) &&
-        userRole === "admin" && <UserMaintenance></UserMaintenance>}
-      {navigationSource === "relatorios" && <div>Conteúdo dos Relatórios</div>}
+      {/* {navigationSource === "dashboard" && <UserMaintenance></UserMaintenance>} */}
+      {(navigationSource === "profissionais" || navigationSource === null) &&
+        userRole === "admin" && <ManageUnits />}
+      {navigationSource === "unidades" && userRole === "admin" && (
+        <ManagePeople />
+      )}
     </div>
   );
 };

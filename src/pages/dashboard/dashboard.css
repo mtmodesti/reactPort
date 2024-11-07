@@ -1,4 +1,5 @@
-.dashboardWrapper{
-    max-height: 100vh;
-    overflow: scroll;
+.dashboardWrapper {
+  max-height: 100vh;
+  overflow: auto;
+  width: 100vw;
 }

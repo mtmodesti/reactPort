@@ -54,4 +54,5 @@ html, body {
   padding: 0;
   height: 100vh; /* Garante que o html e o body ocupem toda a altura da janela */
   overflow: hidden; /* Impede o scroll da página */
+  background-color: #A3BBAD;
 }

@@ -6,20 +6,25 @@ import {
   DialogTitle,
   Button,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Checkbox,
   FormControlLabel,
-  Radio,
-  RadioGroup,
 } from "@mui/material";
 
 const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
   // Inicializa o formData com valores padrão se userData for null ou undefined
   const [formData, setFormData] = useState({
-    userName: '',
-    userEmail: '',
-    document: '',
-    address: '',
-    obs: '',
-    role: 'viewer', // valor padrão para role
+    nome: '',
+    email: '',
+    contatos: '',
+    endereco: '',
+    gerente: '',
+    active: false,
+    servicos: 'option 4', // valor padrão com espaço
+    tipo: 'option 1', // valor padrão com espaço
     ...userData, // Sobrescreve os valores com os dados recebidos
   });
 
@@ -32,15 +37,23 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
     }));
   };
 
+  // Handle change for checkbox
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: checked,
+    }));
+  };
+
   // Handle form submit (update user)
   const handleSubmit = (e) => {
     e.preventDefault();
     onUpdateUser(formData);
   };
 
-  // Effect to log the userData whenever it changes
+  // Atualiza o formData com userData sempre que userData muda
   useEffect(() => {
-    // Se userData for válido, atualizar formData com ele
     if (userData) {
       setFormData((prevData) => ({
         ...prevData,
@@ -51,69 +64,102 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Atualizar Usuário</DialogTitle>
+      <DialogTitle>Atualizar Unidade</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit}>
-          <RadioGroup
-            name="role"
-            value={formData.role || "viewer"} // Define o valor inicial
-            onChange={handleChange}
-            row
-          >
-            <FormControlLabel value="viewer" control={<Radio />} label="Visualizador" />
-            <FormControlLabel value="admin" control={<Radio />} label="Administrador" disabled />
-            <FormControlLabel value="user" control={<Radio />} label="Usuário" />
-          </RadioGroup>
+          {/* Checkbox para Active */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.active}
+                onChange={handleCheckboxChange}
+                name="active"
+              />
+            }
+            label="Ativo"
+          />
 
+          {/* Campo Nome */}
           <TextField
             label="Nome"
-            name="userName"
-            value={formData.userName || ""}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="E-mail"
-            name="userEmail"
-            value={formData.userEmail || ""}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="CPF"
-            name="document"
-            value={formData.document || ""}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            disabled  // Desabilita o campo CPF
-            InputProps={{
-              style: { cursor: "not-allowed" },  // Exibe o cursor de bloqueio
-            }}
-          />
-          <TextField
-            label="Endereço"
-            name="address"
-            value={formData.address || ""}
+            name="nome"
+            value={formData.nome || ""}
             onChange={handleChange}
             fullWidth
             margin="normal"
           />
 
-          {/* Campo de Observações */}
+          {/* Campo E-mail */}
           <TextField
-            label="Observações"
-            name="obs"
-            value={formData.obs || ""}
+            label="E-mail"
+            name="email"
+            value={formData.email || ""}
             onChange={handleChange}
-            multiline
-            maxRows={5}
             fullWidth
-            variant="outlined"
             margin="normal"
           />
+
+          {/* Campo Contatos */}
+          <TextField
+            label="Contatos"
+            name="contatos"
+            value={formData.contatos || ""}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+          />
+
+          {/* Campo Endereço */}
+          <TextField
+            label="Endereço"
+            name="endereco"
+            value={formData.endereco || ""}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+          />
+
+          {/* Campo Gerente */}
+          <TextField
+            label="Gerente"
+            name="gerente"
+            value={formData.gerente || ""}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+          />
+
+          {/* Select para Tipo */}
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="tipo-label">Tipo</InputLabel>
+            <Select
+              labelId="tipo-label"
+              label="Tipo"
+              name="tipo"
+              value={formData.tipo}
+              onChange={handleChange}
+            >
+              <MenuItem value="option 1">Option 1</MenuItem>
+              <MenuItem value="option 2">Option 2</MenuItem>
+              <MenuItem value="option 3">Option 3</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Select para Serviços */}
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="servicos-label">Serviços</InputLabel>
+            <Select
+              labelId="servicos-label"
+              name="servicos"
+              value={formData.servicos}
+              onChange={handleChange}
+              label="Serviços"
+            >
+              <MenuItem value="option 4">Option 4</MenuItem>
+              <MenuItem value="option 5">Option 5</MenuItem>
+              <MenuItem value="option 6">Option 6</MenuItem>
+            </Select>
+          </FormControl>
         </form>
       </DialogContent>
       <DialogActions>

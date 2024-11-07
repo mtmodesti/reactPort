@@ -1,26 +1,12 @@
-Encontrar Pid da porta
-
-netstat -ano | findstr :3000
-
-TCP    0.0.0.0:3000             0.0.0.0:0              LISTENING       1234 -> PID
-
-
-taskkill /PID 1234 /F
-
-
-import React, { useState } from "react";
 import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Typography,
-  TextField,
-  Button,
-  MenuItem,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const DeleteProfessional = () => {
+const GetProfesionals = () => {
   return (
     <Accordion className="accordeon-line">
       <AccordionSummary
@@ -28,7 +14,7 @@ const DeleteProfessional = () => {
         aria-controls="panel1a-content"
         id="panel1a-header"
       >
-        <Typography>Remover profissional</Typography>
+        <Typography>Listar profissionais</Typography>
       </AccordionSummary>
       <AccordionDetails style={{ maxHeight: "300px", overflowY: "auto" }}>
         delete
@@ -37,4 +23,4 @@ const DeleteProfessional = () => {
   );
 };
 
-export default DeleteProfessional;
+export default GetProfesionals;

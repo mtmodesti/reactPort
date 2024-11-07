@@ -58,7 +58,7 @@ const LoginForm = () => {
   const isButtonDisabled = !email || !password || !isEmailValid(email);
 
   return (
-    <Container sx={{ width: "300px" }} className="elevated wrapper">
+    <Container sx={{ width: "300px" }} className="elevated wrapperLogin">
       <form onSubmit={handleSubmit}>
         <TextField
           label="Email"

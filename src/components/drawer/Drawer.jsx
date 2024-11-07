@@ -17,6 +17,8 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { Collapse } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard"; // Ícone para "Dashboard"
 import AssessmentIcon from "@mui/icons-material/Assessment"; // Ícone para "Relatórios"
+import PersonIcon from "@mui/icons-material/Person"; // Ícone para "Gerenciar Profissionais"
+import BusinessIcon from "@mui/icons-material/Business"; // Ícone para "Gerenciar Unidades"
 import { useNavigate } from "react-router-dom";
 import { useNavigation } from "../../context/NavigationContext";
 
@@ -27,11 +29,34 @@ const DrawerSidenavMenu = () => {
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = React.useState("");
 
+  // Verificar a role do usuário
+  const userRole = sessionStorage.getItem("role");
+
   const menuList = [
     {
       title: "Menu",
       icon: <ListIcon />,
       submenu: [
+        {
+          title: "Gerenciar Profissionais",
+          icon: <PersonIcon />, // Ícone para "Gerenciar Profissionais"
+          action: () => {
+            setNavigationSource("profissionais");
+            setActiveItem("profissionais");
+            navigate("/dashboard");
+          },
+          visible: userRole === "admin",
+        },
+        {
+          title: "Gerenciar Unidades",
+          icon: <BusinessIcon />, // Ícone para "Gerenciar Unidades"
+          action: () => {
+            setNavigationSource("unidades");
+            setActiveItem("unidades");
+            navigate("/dashboard");
+          },
+          visible: userRole === "admin",
+        },
         {
           title: "Gerenciamento",
           icon: <DashboardIcon />,
@@ -40,15 +65,8 @@ const DrawerSidenavMenu = () => {
             setActiveItem("dashboard");
             navigate("/dashboard");
           },
-        },
-        {
-          title: "Relatórios",
-          icon: <AssessmentIcon />,
-          action: () => {
-            setNavigationSource("relatorios");
-            setActiveItem("relatorios");
-            navigate("/dashboard");
-          },
+          // Só exibe o item de "Gerenciamento" se o usuário for admin
+          visible: userRole !== "admin",
         },
       ],
     },
@@ -132,32 +150,37 @@ const DrawerSidenavMenu = () => {
             {object.submenu && (
               <Collapse in={submenuOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                  {object.submenu.map((subitem) => (
-                    <ListItem key={subitem.title} disablePadding>
-                      <ListItemButton
-                        onClick={() => {
-                          subitem.action();
-                          setActiveItem(subitem.title.toLowerCase()); // Define o item ativo
-                        }}
-                        sx={{
-                          backgroundColor:
-                            activeItem === subitem.title.toLowerCase()
-                              ? "rgba(0, 0, 255, 0.1)"
-                              : "transparent",
-                          "&:hover": {
-                            backgroundColor: "rgba(0, 0, 255, 0.1)",
-                          },
-                        }}
-                      >
-                        <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
-                          {React.cloneElement(subitem.icon, {
-                            fontSize: "small",
-                          })}
-                        </ListItemIcon>
-                        <ListItemText primary={subitem.title} sx={{ pl: 4 }} />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
+                  {object.submenu.map((subitem) =>
+                    subitem.visible === false ? null : (
+                      <ListItem key={subitem.title} disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            subitem.action();
+                            setActiveItem(subitem.title.toLowerCase()); // Define o item ativo
+                          }}
+                          sx={{
+                            backgroundColor:
+                              activeItem === subitem.title.toLowerCase()
+                                ? "rgba(0, 0, 255, 0.1)"
+                                : "transparent",
+                            "&:hover": {
+                              backgroundColor: "rgba(0, 0, 255, 0.1)",
+                            },
+                          }}
+                        >
+                          <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
+                            {React.cloneElement(subitem.icon, {
+                              fontSize: "small",
+                            })}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={subitem.title}
+                            sx={{ pl: 4 }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    )
+                  )}
                 </List>
               </Collapse>
             )}
