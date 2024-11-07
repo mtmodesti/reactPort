@@ -38,8 +38,8 @@ const DrawerSidenavMenu = () => {
       icon: <ListIcon />,
       submenu: [
         {
-          title: "Gerenciar Profissionais",
-          icon: <PersonIcon />, // Ícone para "Gerenciar Profissionais"
+          title: "Gerenciar Unidades",
+          icon: <BusinessIcon />, 
           action: () => {
             setNavigationSource("profissionais");
             setActiveItem("profissionais");
@@ -48,8 +48,8 @@ const DrawerSidenavMenu = () => {
           visible: userRole === "admin",
         },
         {
-          title: "Gerenciar Unidades",
-          icon: <BusinessIcon />, // Ícone para "Gerenciar Unidades"
+          title: "Gerenciar Profissionais",
+          icon: <PersonIcon />, 
           action: () => {
             setNavigationSource("unidades");
             setActiveItem("unidades");
