@@ -13,28 +13,92 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
+import {
+  fetchUnitsServiceItems,
+  fetchUnitTypesCollection,
+} from "../../services/UnitsService";
 
 const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
-  // Inicializa o formData com valores padrão se userData for null ou undefined
   const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    contatos: '',
-    endereco: '',
-    gerente: '',
+    nome: "",
+    email: "",
+    contatos: "",
+    endereco: "",
+    gerente: "",
     active: false,
-    servicos: 'option 4', // valor padrão com espaço
-    tipo: 'option 1', // valor padrão com espaço
-    ...userData, // Sobrescreve os valores com os dados recebidos
+    servicos: [],
+    tipo: [],
+    ...userData,
   });
+  const [emailError, setEmailError] = useState(false); // Estado para erro de e-mail
+
+  const [serviceOptions, setServiceOptions] = useState([]);
+  const [typeOptions, setTypeOptions] = useState([]);
+
+  // Fetch options for services and types
+  useEffect(() => {
+    fetchUnitsServiceItems().then((services) => setServiceOptions(services));
+    fetchUnitTypesCollection().then((types) => setTypeOptions(types));
+  }, []);
+
+  // Update formData with userData when modal is opened or userData changes
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        ...userData,
+        tipo: Array.isArray(userData.tipo) ? userData.tipo : [userData.tipo], // Certifique-se de que tipo é um array
+        servicos: userData.servicos || [],
+      });
+    }
+  }, [userData]);
+
+  // Função de validação de e-mail
+  const validateEmail = (email) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
+  // Verifica se todos os campos obrigatórios estão preenchidos
+  const isFormValid = () => {
+    const { nome, email, contatos, endereco, gerente, servicos, tipo } =
+      formData;
+    return (
+      nome &&
+      email &&
+      validateEmail(email) && // Verifica se o e-mail é válido
+      contatos &&
+      endereco &&
+      gerente &&
+      servicos.length > 0 && // Verifica se pelo menos um serviço foi selecionado
+      tipo.length > 0 // Verifica se pelo menos um tipo foi selecionado
+    );
+  };
 
   // Handle change for input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+
+    // Valida o e-mail em tempo real
+    if (name === "email") {
+      setEmailError(!validateEmail(value));
+    }
+
+    setFormData((prevData) => {
+      if (name === "tipo") {
+        // Seleciona o(s) tipo(s) completo(s) a partir das opções disponíveis
+        const selectedTypes = typeOptions.filter((type) =>
+          value.includes(type.id)
+        );
+        return {
+          ...prevData,
+          tipo: selectedTypes,
+        };
+      }
+      return {
+        ...prevData,
+        [name]: value,
+      };
+    });
   };
 
   // Handle change for checkbox
@@ -46,28 +110,33 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
     }));
   };
 
+  // Handle change for multiselect field
+  const handleMultiSelectChange = (e) => {
+    const { value } = e.target;
+
+    setFormData((prevData) => {
+      // Seleciona os objetos completos dos serviços com base nos nomes
+      const selectedServices = serviceOptions.filter((service) =>
+        value.includes(service.serviceName)
+      );
+      return {
+        ...prevData,
+        servicos: selectedServices,
+      };
+    });
+  };
+
   // Handle form submit (update user)
   const handleSubmit = (e) => {
     e.preventDefault();
     onUpdateUser(formData);
   };
 
-  // Atualiza o formData com userData sempre que userData muda
-  useEffect(() => {
-    if (userData) {
-      setFormData((prevData) => ({
-        ...prevData,
-        ...userData,
-      }));
-    }
-  }, [userData]);
-
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Atualizar Unidade</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit}>
-          {/* Checkbox para Active */}
           <FormControlLabel
             control={
               <Checkbox
@@ -79,7 +148,6 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
             label="Ativo"
           />
 
-          {/* Campo Nome */}
           <TextField
             label="Nome"
             name="nome"
@@ -89,7 +157,6 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
             margin="normal"
           />
 
-          {/* Campo E-mail */}
           <TextField
             label="E-mail"
             name="email"
@@ -97,9 +164,10 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            error={emailError}
+            helperText={emailError ? "Formato de e-mail inválido" : ""}
           />
 
-          {/* Campo Contatos */}
           <TextField
             label="Contatos"
             name="contatos"
@@ -109,7 +177,6 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
             margin="normal"
           />
 
-          {/* Campo Endereço */}
           <TextField
             label="Endereço"
             name="endereco"
@@ -119,7 +186,6 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
             margin="normal"
           />
 
-          {/* Campo Gerente */}
           <TextField
             label="Gerente"
             name="gerente"
@@ -136,28 +202,33 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
               labelId="tipo-label"
               label="Tipo"
               name="tipo"
-              value={formData.tipo}
+              value={formData.tipo.map((type) => type.id)} // Mapeia para IDs dos tipos
               onChange={handleChange}
             >
-              <MenuItem value="option 1">Option 1</MenuItem>
-              <MenuItem value="option 2">Option 2</MenuItem>
-              <MenuItem value="option 3">Option 3</MenuItem>
+              {typeOptions.map((type) => (
+                <MenuItem key={type.id} value={type.id}>
+                  {type.tipo}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
-          {/* Select para Serviços */}
+          {/* Multiselect para Serviços */}
           <FormControl fullWidth margin="normal">
             <InputLabel id="servicos-label">Serviços</InputLabel>
             <Select
               labelId="servicos-label"
               name="servicos"
-              value={formData.servicos}
-              onChange={handleChange}
+              multiple
+              value={formData.servicos.map((service) => service.serviceName)} // Mapeia para nomes dos serviços
+              onChange={handleMultiSelectChange}
               label="Serviços"
             >
-              <MenuItem value="option 4">Option 4</MenuItem>
-              <MenuItem value="option 5">Option 5</MenuItem>
-              <MenuItem value="option 6">Option 6</MenuItem>
+              {serviceOptions.map((service) => (
+                <MenuItem key={service.id} value={service.serviceName}>
+                  {service.serviceName}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </form>
@@ -166,7 +237,12 @@ const ModalUpdateUser = ({ open, onClose, userData, onUpdateUser }) => {
         <Button variant="contained" onClick={onClose} color="secondary">
           Cancelar
         </Button>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit}
+          disabled={!isFormValid()} // Desabilita o botão se o formulário estiver inválido
+        >
           Atualizar
         </Button>
       </DialogActions>

@@ -54,6 +54,7 @@ const UpdateUnits = () => {
 
   const handleUpdateUser = async (updatedData) => {
     setLoading(true);
+
     try {
       const success = await updateUnitById(updatedData.id, updatedData);
       if (success) {

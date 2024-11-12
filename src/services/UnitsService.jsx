@@ -9,6 +9,8 @@ import {
 import { db } from "../config/firebaseConfig";
 
 const collectionName = `units_${process.env.REACT_APP_PROJECT_NAME}`;
+const unitsServiceCollection = `units_services_${process.env.REACT_APP_PROJECT_NAME}`;
+const unitsTypesCollection = `units_types_${process.env.REACT_APP_PROJECT_NAME}`;
 
 // Função para adicionar uma nova unidade
 export const addUnit = async (unitData) => {
@@ -62,4 +64,26 @@ export const updateUnitById = async (id, updatedData) => {
   const unitDocRef = doc(db, collectionName, id); // Referência ao documento da unidade
   await updateDoc(unitDocRef, updatedData); // Atualiza os campos especificados no documento
   return true; // Retorna verdadeiro se a atualização for bem-sucedida
+};
+
+// Função para buscar todos os documentos da coleção 'unitsServiceCollection'
+export const fetchUnitsServiceItems = async () => {
+  const querySnapshot = await getDocs(collection(db, unitsServiceCollection));
+  // Mapeia os documentos e remove a chave 'password', se houver, de cada item
+  return querySnapshot.docs.map((doc) => {
+    const unitServiceData = { id: doc.id, ...doc.data() };
+    delete unitServiceData.password; // Remove a chave 'password', se necessário
+    return unitServiceData;
+  });
+};
+
+// Função para buscar todos os documentos da coleção 'unitsTypesCollection'
+export const fetchUnitTypesCollection = async () => {
+  const querySnapshot = await getDocs(collection(db, unitsTypesCollection));
+  // Mapeia os documentos e remove a chave 'password', se houver, de cada item
+  return querySnapshot.docs.map((doc) => {
+    const unitServiceData = { id: doc.id, ...doc.data() };
+    delete unitServiceData.password; // Remove a chave 'password', se necessário
+    return unitServiceData;
+  });
 };

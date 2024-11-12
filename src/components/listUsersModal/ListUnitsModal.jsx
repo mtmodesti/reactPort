@@ -46,26 +46,38 @@ const ListUnitsModal = ({ open, onClose }) => {
               <div key={unit.id}>
                 <ListItem>
                   <div>
-                    <Typography variant="h6">{unit.nome}</Typography>
+                    <Typography variant="h6">{unit?.nome || "Sem nome"}</Typography>
                     <Typography variant="caption" color="textSecondary">
-                      Identificador: {unit.id}
-                    </Typography>
-                    <Typography variant="body2">Email: {unit.email}</Typography>
-                    <Typography variant="body2">
-                      Contatos: {unit.contatos}
+                      Identificador: {unit?.id || "Não disponível"}
                     </Typography>
                     <Typography variant="body2">
-                      Endereço: {unit.endereco}
+                      Email: {unit?.email || "Não disponível"}
                     </Typography>
                     <Typography variant="body2">
-                      Gerente: {unit.gerente}
+                      Contatos: {unit?.contatos || "Não disponível"}
                     </Typography>
                     <Typography variant="body2">
-                      Ativo: {unit.active ? "Sim" : "Não"}
+                      Endereço: {unit?.endereco || "Não disponível"}
                     </Typography>
-                    <Typography variant="body2">Tipo: {unit.tipo}</Typography>
                     <Typography variant="body2">
-                      Serviços: {unit.servicos}
+                      Gerente: {unit?.gerente || "Não disponível"}
+                    </Typography>
+                    <Typography variant="body2">
+                      Ativo: {unit?.active ? "Sim" : "Não"}
+                    </Typography>
+                    {/* Aqui estamos verificando se `unit.tipo` é um objeto e então renderizando o valor correto */}
+                    <Typography variant="body2">
+                      Tipo: {" "}
+                      {Array.isArray(unit?.tipo) && unit.tipo.length > 0
+                        ? unit.tipo.map((t) => t?.tipo).join(", ")
+                        : "Não disponível"}
+                    </Typography>
+                    {/* Aqui estamos verificando se `unit.servicos` é um array e então renderizando o `serviceName` de cada serviço */}
+                    <Typography variant="body2">
+                      Serviços:{" "}
+                      {Array.isArray(unit?.servicos) && unit.servicos.length > 0
+                        ? unit.servicos.map((service) => service?.serviceName).join(", ")
+                        : "Não disponível"}
                     </Typography>
                   </div>
                 </ListItem>

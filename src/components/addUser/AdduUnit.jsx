@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
@@ -15,24 +15,28 @@ import {
   Modal,
   Box,
 } from "@mui/material";
-import { addUnit } from "../../services/UnitsService";
+import {
+  addUnit,
+  fetchUnitsServiceItems,
+  fetchUnitTypesCollection,
+} from "../../services/UnitsService"; // Importa a função de buscar tipos
 import { useSnackbar } from "../../utils/SnackbarProvider";
 import "./addUnit.css";
 
 const AddUnit = () => {
   const showSnackbar = useSnackbar();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     nome: "",
-    tipo: "",
+    tipo: [], // Inicializa como array para conter objetos de tipos
     endereco: "",
     contatos: "",
     email: "",
     gerente: "",
-    servicos: "",
+    servicos: [], // Aqui será armazenado um array de objetos de serviços selecionados
   });
 
-  const [errors, setErrors] = React.useState({
+  const [errors, setErrors] = useState({
     nome: false,
     tipo: false,
     endereco: false,
@@ -42,17 +46,62 @@ const AddUnit = () => {
     servicos: false,
   });
 
-  // Função para validar o formato do email
+  // Estado para armazenar os serviços
+  const [serviceOptions, setServiceOptions] = useState([]);
+  const [serviceLoading, setServiceLoading] = useState(true);
+
+  // Estado para armazenar os tipos de unidades
+  const [unitTypes, setUnitTypes] = useState([]);
+  const [unitTypesLoading, setUnitTypesLoading] = useState(true);
+
   const validateEmail = (email) => {
-    // Regex para verificar se o formato do email é válido
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(email);
   };
 
+  const fetchServices = async () => {
+    try {
+      const services = await fetchUnitsServiceItems();
+      setServiceOptions(services);
+    } catch (error) {
+      showSnackbar("Erro ao carregar os serviços.", "error");
+    } finally {
+      setServiceLoading(false);
+    }
+  };
+
+  const fetchUnitTypes = async () => {
+    try {
+      const types = await fetchUnitTypesCollection();
+      setUnitTypes(types);
+    } catch (error) {
+      showSnackbar("Erro ao carregar os tipos de unidades.", "error");
+    } finally {
+      setUnitTypesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchServices();
+    fetchUnitTypes();
+  }, []);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
-    // Validação de email
+
+    if (name === "tipo") {
+      // Para seleção múltipla, armazenamos um array de objetos completos
+      const selectedTypes = unitTypes.filter((type) => value.includes(type.id));
+      setFormData({ ...formData, tipo: selectedTypes });
+    } else if (name === "servicos") {
+      const selectedServices = serviceOptions.filter((service) =>
+        value.includes(service.serviceName)
+      );
+      setFormData({ ...formData, servicos: selectedServices });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+
     if (name === "email" && value && !validateEmail(value)) {
       setErrors({ ...errors, email: true });
     } else {
@@ -63,27 +112,26 @@ const AddUnit = () => {
   const validateForm = () => {
     return (
       formData.nome &&
-      formData.tipo &&
+      formData.tipo.length > 0 && // Certifique-se de que há pelo menos um tipo selecionado
       formData.endereco &&
       formData.contatos &&
       formData.email &&
       formData.gerente &&
-      formData.servicos &&
-      !errors.email // Asegura que o email está válido
+      formData.servicos.length > 0 &&
+      !errors.email
     );
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true); // Ativa o loading
+    setLoading(true);
     try {
-      console.log(formData);
-      await addUnit(formData); // Chama o serviço para adicionar a unidade
+      await addUnit(formData);
       showSnackbar("Unidade adicionada com sucesso.", "success");
     } catch (error) {
       showSnackbar("Erro durante o cadastro. Tente novamente.", "error");
     } finally {
-      setLoading(false); // Desativa o loading, seja sucesso ou erro
+      setLoading(false);
     }
   };
 
@@ -97,7 +145,6 @@ const AddUnit = () => {
         <Typography>Adicionar unidade</Typography>
       </AccordionSummary>
       <AccordionDetails style={{ maxHeight: "300px", overflowY: "auto" }}>
-        {/* Modal de Loading */}
         <Modal
           open={loading}
           onClose={() => {}}
@@ -112,14 +159,13 @@ const AddUnit = () => {
               height: "100vh",
               width: "100vw",
               backgroundColor: "rgba(0, 0, 0, 0.5)",
-              zIndex: 1000, // Garante que o modal fique acima de outros elementos
+              zIndex: 1000,
             }}
           >
             <CircularProgress size={80} />
           </Box>
         </Modal>
 
-        {/* Formulário de Adição de Unidade */}
         <form onSubmit={handleSubmit} noValidate>
           <TextField
             label="Nome"
@@ -139,13 +185,22 @@ const AddUnit = () => {
               labelId="tipo-label"
               label="Tipo"
               name="tipo"
-              value={formData.tipo}
+            
+              value={formData.tipo.map((type) => type.id)} // Mapeia para IDs dos tipos
               onChange={handleChange}
               error={errors.tipo}
             >
-              <MenuItem value="option 1">Option 1</MenuItem>
-              <MenuItem value="option 2">Option 2</MenuItem>
-              <MenuItem value="option 3">Option 3</MenuItem>
+              {unitTypesLoading ? (
+                <MenuItem disabled>Aguarde, carregando tipos...</MenuItem>
+              ) : unitTypes.length > 0 ? (
+                unitTypes.map((type) => (
+                  <MenuItem key={type.id} value={type.id}>
+                    {type.tipo}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>Nenhum tipo de unidade encontrado.</MenuItem>
+              )}
             </Select>
           </FormControl>
 
@@ -204,13 +259,20 @@ const AddUnit = () => {
               labelId="servicos-label"
               label="Serviços"
               name="servicos"
-              value={formData.servicos}
+              multiple
+              value={formData.servicos.map((service) => service.serviceName)}
               onChange={handleChange}
               error={errors.servicos}
             >
-              <MenuItem value="option 4">Option 4</MenuItem>
-              <MenuItem value="option 5">Option 5</MenuItem>
-              <MenuItem value="option 6">Option 6</MenuItem>
+              {serviceLoading ? (
+                <MenuItem disabled>Aguarde, carregando serviços...</MenuItem>
+              ) : (
+                serviceOptions.map((service) => (
+                  <MenuItem key={service.id} value={service.serviceName}>
+                    {service.serviceName}
+                  </MenuItem>
+                ))
+              )}
             </Select>
           </FormControl>
 

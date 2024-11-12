@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -6,29 +6,166 @@ import {
   Typography,
   TextField,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
   MenuItem,
+  Checkbox,
+  ListItemText,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  getProfessionalById,
+  getProfessionalsFunctions,
+  updateProfessionalById,
+} from "../../services/ProfessionalService";
+import { useSnackbar } from "../../utils/SnackbarProvider";
+import { fetchItems } from "../../services/UnitsService";
 
 const EditProfessional = () => {
-  const [formData, setFormData] = useState({
-    nome: "",
-    tipo: "",
-    endereco: "",
-    contatos: "",
-    email: "",
-    gerente: "",
-    servicos: "",
-  });
+  const showSnackbar = useSnackbar();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const [id, setId] = useState("");
+  const [professional, setProfessional] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [registroProfissional, setRegistroProfissional] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
+  const [observacoes, setObservacoes] = useState("");
+  const [inicioExercicio, setInicioExercicio] = useState("");
+  const [active, setActive] = useState(true);
+  const [professions, setProfessions] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [selectedProfessions, setSelectedProfessions] = useState([]);
+  const [selectedUnits, setSelectedUnits] = useState([]);
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+
+  useEffect(() => {
+    const validateForm = () => {
+      const requiredFieldsFilled =
+        name &&
+        registroProfissional &&
+        cpf &&
+        email &&
+        login &&
+        inicioExercicio &&
+        selectedProfessions.length > 0 &&
+        selectedUnits.length > 0;
+      const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      setIsSaveDisabled(!(requiredFieldsFilled && isEmailValid));
+    };
+
+    validateForm();
+  }, [
+    name,
+    registroProfissional,
+    cpf,
+    email,
+    login,
+    inicioExercicio,
+    selectedProfessions,
+    selectedUnits,
+  ]);
+
+  const handleEditClick = async () => {
+    try {
+      const fetchedProfessional = await getProfessionalById(id);
+      if (fetchedProfessional) {
+        setProfessional(fetchedProfessional);
+        setName(fetchedProfessional.nomeCompleto);
+        setRegistroProfissional(fetchedProfessional.registroProfissional);
+        setCpf(fetchedProfessional.cpf);
+        setEmail(fetchedProfessional.email);
+        setLogin(fetchedProfessional.login);
+        setObservacoes(fetchedProfessional.observacoes);
+        setInicioExercicio(fetchedProfessional.inicioExercicio || "");
+        setActive(fetchedProfessional.active);
+
+        const professionalsFunctions = await getProfessionalsFunctions();
+        const items = await fetchItems();
+
+        setProfessions(professionalsFunctions);
+        setUnits(items.filter((item) => item.active === true));
+
+        setSelectedProfessions(
+          (fetchedProfessional.funcao || []).map((func) => func.id)
+        );
+        setSelectedUnits(
+          (fetchedProfessional.unidades || []).map((unit) => unit.id)
+        );
+        setOpen(true);
+      } else {
+        showSnackbar("Profissional não encontrado", "error");
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao buscar o profissional ou capturar informações adicionais:",
+        error
+      );
+      showSnackbar(
+        "Erro ao buscar o profissional ou informações adicionais",
+        "error"
+      );
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
+  const handleInputChange = (event) => setId(event.target.value);
+  const handleNameChange = (event) => setName(event.target.value);
+  const handleRegistroProfissionalChange = (event) =>
+    setRegistroProfissional(event.target.value);
+  const handleCpfChange = (event) => setCpf(event.target.value);
+  const handleEmailChange = (event) => setEmail(event.target.value);
+  const handleLoginChange = (event) => setLogin(event.target.value);
+  const handleObservacoesChange = (event) => setObservacoes(event.target.value);
+  const handleInicioExercicioChange = (event) =>
+    setInicioExercicio(event.target.value);
+  const handleActiveChange = (event) =>
+    setActive(event.target.value === "true");
+  const handleProfessionSelect = (event) => {
+    const selected = event.target.value;
+    setSelectedProfessions(selected);
+  };
+  const handleUnitSelect = (event) => {
+    const selected = event.target.value;
+    setSelectedUnits(selected);
+  };
+
+  const handleClose = async () => {
+    const selectedProfessionObjects = selectedProfessions.map((id) =>
+      professions.find((profession) => profession.id === id)
+    );
+    const selectedUnitObjects = selectedUnits.map((id) =>
+      units.find((unit) => unit.id === id)
+    );
+
+    const updatedData = {
+      active,
+      cpf,
+      email,
+      funcao: selectedProfessionObjects,
+      inicioExercicio,
+      login,
+      nomeCompleto: name,
+      observacoes,
+      registroProfissional,
+      unidades: selectedUnitObjects,
+    };
+
+    setOpen(false);
+    await updateProfessionalById(id, updatedData);
+    console.log("att com sucesso");
+    showSnackbar("Profissional editado com sucesso", "success");
   };
 
   return (
@@ -41,98 +178,188 @@ const EditProfessional = () => {
         <Typography>Editar profissional</Typography>
       </AccordionSummary>
       <AccordionDetails style={{ maxHeight: "300px", overflowY: "auto" }}>
-        <form onSubmit={handleSubmit}>
+        <TextField
+          label="ID do Profissional"
+          variant="outlined"
+          fullWidth
+          value={id}
+          onChange={handleInputChange}
+          style={{ marginBottom: "16px" }}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleEditClick}
+          disabled={!id}
+        >
+          Editar profissional
+        </Button>
+      </AccordionDetails>
+
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Editar Profissional</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="textSecondary" gutterBottom>
+            <strong>Identificador do Usuário:</strong> {professional?.id}
+          </Typography>
+
+          <FormControl component="fieldset" margin="normal">
+            <RadioGroup
+              row
+              value={active ? "true" : "false"}
+              onChange={handleActiveChange}
+            >
+              <FormControlLabel
+                value="true"
+                control={<Radio />}
+                label="Ativo"
+              />
+              <FormControlLabel
+                value="false"
+                control={<Radio />}
+                label="Inativo"
+              />
+            </RadioGroup>
+          </FormControl>
+
           <TextField
-            label="Nome"
-            name="nome"
+            label="Nome Completo"
             variant="outlined"
             fullWidth
-            required
-            margin="normal"
-            value={formData.nome}
-            onChange={handleChange}
+            value={name}
+            onChange={handleNameChange}
+            style={{ marginTop: "16px", marginBottom: "16px" }}
           />
+
           <TextField
-            label="Tipo"
-            name="tipo"
+            label="Início do Exercício"
+            type="date"
             variant="outlined"
             fullWidth
             required
             margin="normal"
-            select
-            value={formData.tipo}
-            onChange={handleChange}
-          >
-            <MenuItem value="tipo1">Tipo 1</MenuItem>
-            <MenuItem value="tipo2">Tipo 2</MenuItem>
-            <MenuItem value="tipo3">Tipo 3</MenuItem>
-          </TextField>
-          <TextField
-            label="Endereço"
-            name="endereco"
-            variant="outlined"
-            fullWidth
-            required
-            margin="normal"
-            value={formData.endereco}
-            onChange={handleChange}
+            InputLabelProps={{ shrink: true }}
+            value={inicioExercicio}
+            onChange={handleInicioExercicioChange}
+            style={{ marginBottom: "16px" }}
           />
+
           <TextField
-            label="Contatos"
-            name="contatos"
+            label="CPF"
             variant="outlined"
             fullWidth
-            required
-            margin="normal"
-            value={formData.contatos}
-            onChange={handleChange}
+            value={cpf}
+            onChange={handleCpfChange}
+            style={{ marginBottom: "16px" }}
           />
+
+          <TextField
+            label="Registro Profissional"
+            variant="outlined"
+            fullWidth
+            value={registroProfissional}
+            onChange={handleRegistroProfissionalChange}
+            style={{ marginBottom: "16px" }}
+          />
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Funções</InputLabel>
+            <Select
+              multiple
+              value={selectedProfessions}
+              onChange={handleProfessionSelect}
+              input={<OutlinedInput label="Funções" />}
+              renderValue={(selected) =>
+                selected
+                  .map(
+                    (id) =>
+                      professions.find((profession) => profession.id === id)
+                        ?.type
+                  )
+                  .join(", ")
+              }
+            >
+              {professions.map((profession) => (
+                <MenuItem key={profession.id} value={profession.id}>
+                  <Checkbox
+                    checked={selectedProfessions.includes(profession.id)}
+                  />
+                  <ListItemText primary={profession.type} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Unidade de Trabalho</InputLabel>
+            <Select
+              multiple
+              value={selectedUnits}
+              onChange={handleUnitSelect}
+              input={<OutlinedInput label="Unidade de Trabalho" />}
+              renderValue={(selected) =>
+                selected
+                  .map((id) => units.find((unit) => unit.id === id)?.endereco)
+                  .join(", ")
+              }
+            >
+              {units.map((unit) => (
+                <MenuItem key={unit.id} value={unit.id}>
+                  <Checkbox checked={selectedUnits.includes(unit.id)} />
+                  <ListItemText primary={unit.endereco} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
             label="Email"
-            name="email"
-            type="email"
             variant="outlined"
             fullWidth
-            required
-            margin="normal"
-            value={formData.email}
-            onChange={handleChange}
+            value={email}
+            onChange={handleEmailChange}
+            style={{ marginBottom: "16px" }}
           />
+
           <TextField
-            label="Gerente"
-            name="gerente"
+            label="Login"
             variant="outlined"
             fullWidth
-            required
-            margin="normal"
-            value={formData.gerente}
-            onChange={handleChange}
+            value={login}
+            onChange={handleLoginChange}
+            style={{ marginBottom: "16px" }}
           />
+
           <TextField
-            label="Serviços"
-            name="servicos"
+            label="Observações"
             variant="outlined"
             fullWidth
-            required
-            margin="normal"
-            select
-            value={formData.servicos}
-            onChange={handleChange}
-          >
-            <MenuItem value="servico1">Serviço 1</MenuItem>
-            <MenuItem value="servico2">Serviço 2</MenuItem>
-            <MenuItem value="servico3">Serviço 3</MenuItem>
-          </TextField>
+            multiline
+            rows={4}
+            value={observacoes}
+            onChange={handleObservacoesChange}
+            style={{ marginBottom: "16px" }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="primary">
+            Cancelar
+          </Button>
           <Button
-            type="submit"
+            onClick={handleClose}
             variant="contained"
             color="primary"
-            style={{ marginTop: "16px" }}
+            disabled={isSaveDisabled}
           >
-            Adicionar
+            Salvar
           </Button>
-        </form>
-      </AccordionDetails>
+        </DialogActions>
+      </Dialog>
     </Accordion>
   );
 };

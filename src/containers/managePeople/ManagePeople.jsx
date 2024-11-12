@@ -7,10 +7,10 @@ import GetProfesionals from "../../components/getProfessionals/GetProfessionals"
 const ManagePeople = () => {
   return (
     <div className="peopleContainer">
+      <GetProfesionals />
       <AddProfessional />
       <EditProfessional />
       <DeleteProfessional />
-      <GetProfesionals />
     </div>
   );
 };
