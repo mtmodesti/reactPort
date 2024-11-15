@@ -30,23 +30,32 @@ export const addUser = async (newUser) => {
 };
 
 // Função para verificar se um usuário com o email e senha especificados já existe
+
 export const handleLogin = async (email, password) => {
-  const q = query(
-    collection(db, collectionName),
-    where("userEmail", "==", email),
-    where("password", "==", password)
-  );
-  const querySnapshot = await getDocs(q);
+  try {
+    // Consulta com filtros de email e senha
+    const q = query(
+      collection(db, collectionName),
+      where("email", "==", email),
+      where("password", "==", password)
+    );
 
-  if (!querySnapshot.empty) {
-    const userDoc = querySnapshot.docs[0];
-    const userData = userDoc.data();
-    const user = { id: userDoc.id, ...userData };
-    setUserSession(user);
-    return user;
+    const querySnapshot = await getDocs(q);
+
+    // Verifica se há resultados
+    if (!querySnapshot.empty) {
+      // Assume que o primeiro resultado é o usuário correto
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      const user = { id: userDoc.id, ...userData };
+      setUserSession(user);
+      return user;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    throw error;
   }
-
-  return null; // Retorna null se o email não existir
 };
 
 // Função para checar se um email já existe
@@ -140,9 +149,9 @@ export const fetchUserByEmailOrCpf = async (searchValue) => {
 
 // Função para configurar a sessão do usuário
 const setUserSession = (user) => {
-  sessionStorage.setItem("userName", user.userName);
-  sessionStorage.setItem("userEmail", user.userEmail);
-  sessionStorage.setItem("userId", user.id);
+  sessionStorage.setItem("name", user.nomeCompleto);
+  sessionStorage.setItem("email", user.email);
+  sessionStorage.setItem("id", user.id);
   sessionStorage.setItem("role", user.role);
 };
 

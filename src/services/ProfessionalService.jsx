@@ -10,6 +10,7 @@ import { db } from "../config/firebaseConfig";
 
 const professionalFunctions = `professionalFunctions_${process.env.REACT_APP_PROJECT_NAME}`;
 const professionals = `professionals_${process.env.REACT_APP_PROJECT_NAME}`;
+const users = `users_${process.env.REACT_APP_PROJECT_NAME}`;
 
 // Função para buscar todos os documentos da coleção de funções
 export const getProfessionalsFunctions = async () => {
@@ -25,12 +26,12 @@ export const getProfessionalsFunctions = async () => {
 
 // Função para buscar todos os documentos da coleção de professionais
 export const getProfessionals = async () => {
-  const querySnapshot = await getDocs(collection(db, professionals));
+  const querySnapshot = await getDocs(collection(db, users));
 
   // Mapeia os documentos e remove a chave 'password' de cada unidade, se houver
   return querySnapshot.docs.map((doc) => {
     const unitData = { id: doc.id, ...doc.data() };
-    delete unitData.password; // Remove a chave 'password', se necessário
+    delete unitData.password; // Remove a chave 'password', se necessário,
     return unitData;
   });
 };
@@ -38,7 +39,7 @@ export const getProfessionals = async () => {
 // Função para adicionar uma nova unidade
 export const addProfessional = async (unitData) => {
   const newData = { ...unitData, active: true };
-  const docRef = await addDoc(collection(db, professionals), newData);
+  const docRef = await addDoc(collection(db, users), newData);
   return docRef.id; // Retorna o ID do documento adicionado
 };
 
@@ -46,7 +47,7 @@ export const addProfessional = async (unitData) => {
 export const updateProfessionalStatus = async (id, isActive) => {
   try {
     // Referência ao documento com o ID fornecido
-    const docRef = doc(db, professionals, id);
+    const docRef = doc(db, users, id);
 
     // Atualiza o campo 'active' com o valor do parâmetro isActive
     await updateDoc(docRef, { active: isActive });
@@ -60,7 +61,7 @@ export const updateProfessionalStatus = async (id, isActive) => {
 export const getProfessionalById = async (id) => {
   try {
     // Referência ao documento com o ID fornecido
-    const docRef = doc(db, professionals, id);
+    const docRef = doc(db, users, id);
 
     // Busca o documento pelo ID
     const docSnapshot = await getDoc(docRef);

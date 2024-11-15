@@ -5,9 +5,9 @@ import LoginForm from "../../components/loginForm/LoginForm";
 const Home = () => {
   useEffect(() => {
     sessionStorage.removeItem("role");
-    sessionStorage.removeItem("userId");
-    sessionStorage.removeItem("userEmail");
-    sessionStorage.removeItem("userName");
+    sessionStorage.removeItem("id");
+    sessionStorage.removeItem("name");
+    sessionStorage.removeItem("email");
   }, []);
 
   return (

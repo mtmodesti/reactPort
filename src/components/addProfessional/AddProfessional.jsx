@@ -105,6 +105,8 @@ const AddProfessional = () => {
       inicioExercicio,
       unidades: unidadesCompletas,
       observacoes,
+      password: "default",
+      role: "professional",
     };
 
     setLoading(true);

@@ -10,12 +10,12 @@ const Dashboard = () => {
 
   return (
     <div className="dashboardWrapper">
-      {/* {navigationSource === "dashboard" && <UserMaintenance></UserMaintenance>} */}
       {(navigationSource === "profissionais" || navigationSource === null) &&
         userRole === "admin" && <ManageUnits />}
       {navigationSource === "unidades" && userRole === "admin" && (
         <ManagePeople />
       )}
+      {userRole === "professional" && <span>oi</span>}
     </div>
   );
 };

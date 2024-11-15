@@ -36,7 +36,12 @@ const GetProfesionals = () => {
   const fetchData = async () => {
     try {
       const professionalsListData = await getProfessionals();
-      setProfessionalsList(professionalsListData);
+      console.log("professionalsListData");
+      console.log(professionalsListData);
+
+      setProfessionalsList(
+        professionalsListData.filter((element) => element.role !== "admin")
+      );
       setOpen(true); // Abre o modal após o carregamento dos dados
     } catch (error) {
       console.error("Erro ao buscar funções de profissionais:", error);
